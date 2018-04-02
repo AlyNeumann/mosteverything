@@ -1,12 +1,19 @@
 .title {
-
+font-size:50px;
 }
 .subtitle {
-
+font-size:30px;
 }
 .content {
-
+font-size:20px;
 }
 .emph {
-
+font-style:italic;
 }
+body{
+   text-align:center; 
+}
+.content{
+    text-align:left;
+}
+

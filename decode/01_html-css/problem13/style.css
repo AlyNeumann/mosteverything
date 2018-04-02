@@ -1,0 +1,16 @@
+.box{
+    display: flex;
+}
+.row{
+    text-align: center;
+    border-style: dashed;
+    margin:20px;
+    padding: 10px;
+}
+#container{
+    margin: 100px;
+    text-align: center;
+}
+.smol {
+    height:100px;
+}
