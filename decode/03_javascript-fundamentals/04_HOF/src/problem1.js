@@ -1,5 +1,12 @@
-
+// console.log("here we are now");
 function callNoException(f, arg) {
+    try{
+        var x = f(arg);
+        return x;
+    }catch(err){
+        return null;
+    }
+
     // if f(arg) throws an exception, return null
     // otherwise return what f(arg) returned
     // Example:
@@ -12,6 +19,11 @@ function callNoException(f, arg) {
 }
 
 function callNoNull(f, arg) {
+    if(f(arg) == null){
+        throw new Error("That didn't work so well bud.");
+    }
+    return f(arg);
+
     // if f(arg) returns null, throw an exception
     // otherwise return what f(arg) returned  
     // Example: 
@@ -26,6 +38,12 @@ function callNoNull(f, arg) {
 }
 
 function exceptionalize(f) {
+     return function g(arg){
+    if(f(arg) == null){
+        throw new Error("Woops");    
+    } return f(arg);
+}
+
     // returns a new function
     // this function takes 1 input, called arg
     // if f(arg) is null, this new function throws an exception
@@ -43,6 +61,13 @@ function exceptionalize(f) {
 }
 
 function nullify(f) {
+
+    return function g(arg){
+        try{return f(arg)
+        }catch(err){
+            return null;
+        }
+    }
     // returns a new function
     // this function takes 1 input, called arg
     // if f(arg) throws an exception, this new function returns null
@@ -59,6 +84,11 @@ function nullify(f) {
 }
 
 function map(lst, f) {
+    return 
+
+
+
+    // YOU GOT TO HERE, CONTINUE AFTER S.C.
     // lst is an array and f is a function
     // map returns an array with the same number of elements as lst
     // if lst = [a1, a2, a3, a4, a5] then map(lst, f) returns [f(a1), f(a2), f(a3), f(a4), f(a5)]
