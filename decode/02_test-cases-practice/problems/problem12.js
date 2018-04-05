@@ -2,11 +2,15 @@ var assert = require('assert');
 
 // we need 5 test cases. 
 let inputs = [
-  
+  [1,2,3],
+  [2],
+  [1,2,3],
+  "hey",
+
 ]
 
 let outputs = [
-  
+  // not sure what this should look like
 ]
 
 /*
@@ -20,7 +24,9 @@ uniqueElements([1,2,3], [1,2,3]); // []
 uniqueElements(2,3); // undefined, not arrays
 */
 function f(arr1, arr2) {
-    
+    // if arr1 !== arr2 return the unique stuff
+    // if arr1 === arr2 return empty array
+    // if typeof is not array return undefined
 }
 
 function runTest(i) {

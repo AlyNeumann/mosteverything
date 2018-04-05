@@ -2,11 +2,23 @@ var assert = require('assert');
 
 // we need 7 test cases. 
 let inputs = [
-  
+  ["hey", 3],
+  ["ho", 4],
+  ["lets", 2],
+  ["what", -2],
+  ["you", -5],
+  ["say", -3],
+  ["go", 1]
 ]
 
 let outputs = [
-  
+  "heyheyhey",
+  "hohohoho",
+  "letslets",
+  undefined,
+  undefined,
+  undefined,
+  "go"
 ]
 
 /*
@@ -19,9 +31,30 @@ f(["foo", 3]) // "foofoofoo"
 f(["fo", 3]) // "fofofo"
 f(["foo", -1]) // undefined
 */
-function f(arr) {
-    
+// function f(arr) {
+//     var says = arr[0];
+//     for(i = 0; i <= arr[1]; i++){
+//         says = says + says[i];
+//     } 
+//     return says;
+// }
+
+// function f(arr){
+//     if(arr[1] === "number"){
+//         return arr[0] * arr[1];
+//     }else{
+//         return undefined;
+//     }
+// }
+
+function f(arr){
+    if(arr[1] >= 0){
+        return arr[0].repeat(arr[1])
+    }
 }
+
+
+
 
 function runTest(i) {
     if(i > inputs.length) throw new Error("You do not have enough test cases");
