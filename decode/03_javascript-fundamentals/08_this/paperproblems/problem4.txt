@@ -2,13 +2,13 @@ What is the output of this program?
 
 'use strict';
 
-var obj = {
-    bar: function(i) {console.log(this.baz + i);},
-    baz: 12
-}
+1 var obj = {
+2    bar: function(i) {console.log(this.baz + i);},
+3    baz: 12
+4 }
 
-function f(g) {
-    console.log(g(4));
-}
+5 function f(g) {
+6    console.log(g(4));
+7 }
 
-f(obj.bar);
+8 f(obj.bar);
