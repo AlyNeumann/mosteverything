@@ -3,8 +3,11 @@
 // The first time it is called it returns 1
 // Every call thereafter returns a number one greater than the last
 
+console.log("You are on the scoping page");
+
+var x = 0;  
 function f() {
-    var x = 0;  
+ 
     x = x + 1;
     return x;
 }
