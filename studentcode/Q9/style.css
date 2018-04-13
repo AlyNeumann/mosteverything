@@ -1,0 +1,22 @@
+body {
+background-image: url(backgroundForest.jpg);
+}
+
+#cupcake{
+
+position: absolute;
+right: 30px;
+bottom: 10px;
+}
+
+#unicorn{
+position: absolute;
+bottom: 10px;
+}
+
+#text {
+color: white;
+font-family: cursive;
+	font-size: 46px;
+}
+
