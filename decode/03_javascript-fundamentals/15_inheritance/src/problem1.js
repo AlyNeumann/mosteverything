@@ -1,10 +1,22 @@
 class Shape {
+
     toString() {
         return "This shape has an area of " + this.area() + " and perimeter " + this.perimeter();
     }
 }
 
-class Rectangle {
+class Rectangle extends Shape{
+    constructor(width, height){
+        super();
+        this.width = width;
+        this.height = height;
+    }
+    area() {
+        return this.width * this.height;
+    }
+    perimeter() {
+       return (this.width * 2) + (this.height * 2);
+    }
 
     // A rectangle is a shape
     // Every rectangle has a width and a height
@@ -13,7 +25,12 @@ class Rectangle {
     // The constructor has two arguments: width and height
 }
 
-class Square {
+class Square extends Rectangle {
+    constructor(n){
+        super(n, n);
+
+        // console.log(this.height);
+    }
     // A square is a rectangle
     // Every square has a width and a height
     // The height and width of a square are always the same
@@ -22,5 +39,7 @@ class Square {
     // The constructor has one argument
 }
 
+var coolShape = new Square(3);
+console.log(coolShape.perimeter);
 
 module.exports = {Shape, Rectangle, Square};
