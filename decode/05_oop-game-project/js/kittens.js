@@ -1,3 +1,4 @@
+//TO DO - make toonie count message stay up longer,  & switch out images! Try to get 10 x toonies to equal a whiskey bottle.
 // This sectin contains some game constants. It is not super interesting
 var GAME_WIDTH = 375;
 var GAME_HEIGHT = 500;
@@ -6,28 +7,41 @@ var ENEMY_WIDTH = 75;
 var ENEMY_HEIGHT = 156;
 var MAX_ENEMIES = 3;
 
+var TOONIE_WIDTH = 75;
+var TOONIE_HEIGHT = 74;
+var MAX_TOONIES = 1;
+
 var PLAYER_WIDTH = 75;
 var PLAYER_HEIGHT = 54;
 
 // These two constants keep us from using "magic numbers" in our code
 var LEFT_ARROW_CODE = 37;
 var RIGHT_ARROW_CODE = 39;
+// var PAUSE_BUTTON_CODE = 32;
 
 // These two constants allow us to DRY
 var MOVE_LEFT = 'left';
 var MOVE_RIGHT = 'right';
 
+// var pause = document.getElementById('pause');
+// work on ^ later
+var reload = document.getElementById('reload');
+
 // Preload game images
 var images = {};
-['enemy.png', 'stars.png', 'player.png'].forEach(imgName => {
+['enemy.png', 'stars.png', 'player.png', 'toonie.png'].forEach(imgName => {
     var img = document.createElement('img');
     img.src = 'images/' + imgName;
     images[imgName] = img;
 });
 
+reload.addEventListener("click", ()=> {
+    location.reload();
+})
 
-
-
+// pause.addEventListener("click", () => {
+//     pause()
+// ;})
 
 // This section is where you will be doing most of your coding
 class Enemy {
@@ -35,6 +49,25 @@ class Enemy {
         this.x = xPos;
         this.y = -ENEMY_HEIGHT;
         this.sprite = images['enemy.png'];
+
+        // Each enemy should have a different speed
+        this.speed = Math.random() / 2 + 0.25;
+    }
+
+    update(timeDiff) {
+        this.y = this.y + timeDiff * this.speed;
+    }
+
+    render(ctx) {
+        ctx.drawImage(this.sprite, this.x, this.y);
+    }
+}
+
+class Toonie {
+    constructor(xPos) {
+        this.x = xPos;
+        this.y = -TOONIE_HEIGHT;
+        this.sprite = images['toonie.png'];
 
         // Each enemy should have a different speed
         this.speed = Math.random() / 2 + 0.25;
@@ -84,9 +117,12 @@ class Engine {
     constructor(element) {
         // Setup the player
         this.player = new Player();
+        this.paused = false
 
         // Setup enemies, making sure there are always three
         this.setupEnemies();
+        this.setupToonies();
+        
 
         // Setup the <canvas> element where we will be drawing
         var canvas = document.createElement('canvas');
@@ -114,13 +150,32 @@ class Engine {
         }
     }
 
+    setupToonies() {
+        if(!this.toonies){
+            this.toonies = [];
+        }
+        while (this.toonies.filter(e => !!e).length <= MAX_TOONIES){
+            this.addToonie();
+        }
+    }
+
+    addToonie() {
+        var toonieSpots = GAME_WIDTH / TOONIE_WIDTH;
+
+        var toonieSpot;
+        while(!toonieSpot && this.toonies[toonieSpot]){
+            toonieSpot = Math.floor(Math.random() * toonieSpots);
+        }
+        this.toonies[toonieSpot] = new Toonie(toonieSpot * TOONIE_WIDTH);
+    }
+
     // This method finds a random spot where there is no enemy, and puts one in there
     addEnemy() {
-        var enemySpots = GAME_WIDTH / ENEMY_WIDTH;
+        var enemySpots = GAME_WIDTH / ENEMY_WIDTH ;
 
         var enemySpot;
         // Keep looping until we find a free enemy spot at random
-        while (!enemySpot || this.enemies[enemySpot]) {
+        while (!enemySpot && this.enemies[enemySpot]) {
             enemySpot = Math.floor(Math.random() * enemySpots);
         }
 
@@ -130,6 +185,7 @@ class Engine {
     // This method kicks off the game
     start() {
         this.score = 0;
+        this.toonieCount = 0;
         this.lastFrame = Date.now();
 
         // Listen for keyboard left/right and update the player
@@ -140,7 +196,12 @@ class Engine {
             else if (e.keyCode === RIGHT_ARROW_CODE) {
                 this.player.move(MOVE_RIGHT);
             }
+            else if(e.keyCode === PAUSE_BUTTON_CODE) {
+                this.paused = !this.paused
+            }
         });
+        
+
 
         this.gameLoop();
     }
@@ -156,20 +217,27 @@ class Engine {
     You should use this parameter to scale your update appropriately
      */
     gameLoop() {
+
         // Check how long it's been since last frame
+
         var currentFrame = Date.now();
         var timeDiff = currentFrame - this.lastFrame;
 
         // Increase the score!
         this.score += timeDiff;
+        // this.toonieCount = this.toonieCount;
+
+        //toonie count
 
         // Call update on all enemies
         this.enemies.forEach(enemy => enemy.update(timeDiff));
+        this.toonies.forEach(toonie => toonie.update(timeDiff));
 
         // Draw everything!
         this.ctx.drawImage(images['stars.png'], 0, 0); // draw the star bg
         this.enemies.forEach(enemy => enemy.render(this.ctx)); // draw the enemies
         this.player.render(this.ctx); // draw the player
+        this.toonies.forEach(toonie => toonie.render(this.ctx));
 
         // Check if any enemies should die
         this.enemies.forEach((enemy, enemyIdx) => {
@@ -178,6 +246,27 @@ class Engine {
             }
         });
         this.setupEnemies();
+
+        // Check if toonies should disappear 
+
+        this.toonies.forEach((toonie, toonieIdx) => {
+            if(toonie.y > GAME_HEIGHT){
+                delete this.toonies[toonieIdx];
+            }
+        })
+        this.setupToonies();
+
+        //Check if toonie is caught
+        if(this.isToonieCaught()){
+            
+            this.ctx.font = 'bold 30px Impact';
+            this.ctx.fillStyle = '#ffffff';
+            this.ctx.fillText('You are ' + this.toonieCount + " richer!", 30, 60);
+            this.toonieCount++;
+            console.log("TOONY CAUGHT", this.toonieCount)
+            
+        }
+
 
         // Check if player is dead
         if (this.isPlayerDead()) {
@@ -198,13 +287,43 @@ class Engine {
         }
     }
 
+    isToonieCaught(){
+        const hasCollided = (toonie, player) => {
+            if(player.y - TOONIE_HEIGHT < toonie.y && player.x === toonie.x){
+                return true;
+            }
+            return false; 
+        }
+        var caughtToonie =  this.toonies.some((e)=> hasCollided(e, this.player))
+        
+        
+        this.toonies && this.toonies.forEach((e, i)=> hasCollided(e, this.player) &&  delete this.toonies[i])
+        
+        
+        return caughtToonie
+    }
+
+
     isPlayerDead() {
         // TODO: fix this function!
-        return false;
+        
+        // this.enemies // array of enemies
+        // var enemy // x , y, W, H
+        // this.player // x, y, W, H
+        const hasCollided = (enemy, player)=>{
+            // if(player.y - PLAYER_HEIGHT > enemy.y){console.log("COLLISION", player, enemy )} 
+            // enemy.x = player.x + PLAYER_WIDTH;
+            // enemy.y = player.y;
+
+            if(player.y - ENEMY_HEIGHT < enemy.y && player.x === enemy.x){
+                return true;
+            }
+            return false
+            
+        } 
+        return this.enemies.some((e)=> hasCollided(e, this.player))
     }
 }
-
-
 
 
 
