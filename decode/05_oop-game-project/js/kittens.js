@@ -1,35 +1,62 @@
-//TO DO - make toonie count message stay up longer,  & switch out images! Try to get 10 x toonies to equal a whiskey bottle.
-// This sectin contains some game constants. It is not super interesting
-var GAME_WIDTH = 375;
-var GAME_HEIGHT = 500;
 
-var ENEMY_WIDTH = 75;
+// This sectin contains some game constants. It is not super interesting
+//TO DO - Timer - needs to stop when you DIE... Need Toonie Counter!
+//add music, whistle, and applause 
+//can you restart round without reloading page?
+var GAME_WIDTH = 1125;
+var GAME_HEIGHT = 749;
+
+var ENEMY_WIDTH = 150;
 var ENEMY_HEIGHT = 156;
 var MAX_ENEMIES = 3;
 
-var TOONIE_WIDTH = 75;
+var TOONIE_WIDTH = 150;
 var TOONIE_HEIGHT = 74;
 var MAX_TOONIES = 1;
 
-var PLAYER_WIDTH = 75;
-var PLAYER_HEIGHT = 54;
+var PLAYER_WIDTH = 150;
+var PLAYER_HEIGHT = 283;
 
 // These two constants keep us from using "magic numbers" in our code
 var LEFT_ARROW_CODE = 37;
 var RIGHT_ARROW_CODE = 39;
-// var PAUSE_BUTTON_CODE = 32;
 
 // These two constants allow us to DRY
 var MOVE_LEFT = 'left';
 var MOVE_RIGHT = 'right';
 
-// var pause = document.getElementById('pause');
-// work on ^ later
-var reload = document.getElementById('reload');
 
-// Preload game images
+var reload = document.getElementById('reload');
+var song = new Audio('JELLYROLL_MASTER.mp3');
+var toonieAudio = new Audio('toonieS.mp3');
+var policeAudio = new Audio('policeS.mp3');
+var lostAudio = new Audio('youLoseS.mp3');
+var wonAudio = new Audio('youWinS.mp3');
+
+function playSong(){
+    song.play();
+}
+
+function toonieSound(){
+    toonieAudio.play();
+}
+
+function policeSound(){
+    policeAudio.play();
+}
+
+function youLoseAudio(){
+    lostAudio.play();
+}
+
+function youWinAudio(){
+    wonAudio.play();
+}
+
+
+
 var images = {};
-['enemy.png', 'stars.png', 'player.png', 'toonie.png'].forEach(imgName => {
+['Policeman.png', 'SaintCatherine.jpg', 'TylerSizedR.png', 'toonie.png'].forEach(imgName => {
     var img = document.createElement('img');
     img.src = 'images/' + imgName;
     images[imgName] = img;
@@ -38,6 +65,27 @@ var images = {};
 reload.addEventListener("click", ()=> {
     location.reload();
 })
+
+
+// timer function
+function countDown(sec, elem){
+    var element = document.getElementById(elem);
+    element.innerHTML = "You have " + sec + " seconds to make money!";
+    if(sec < 1){
+        clearTimeout(timer);
+        element.innerHTML = '<p class="typing">Round Complete!</p>';
+        element.innerHTML += '<p class="typing">Press the Reload button to play again!</p>';
+    }
+    sec--;
+    var timer = setTimeout('countDown('+sec+', "'+elem+'")', 1000);
+    
+
+    
+}
+    
+    
+// countDown(60, "status")
+
 
 // pause.addEventListener("click", () => {
 //     pause()
@@ -48,7 +96,7 @@ class Enemy {
     constructor(xPos) {
         this.x = xPos;
         this.y = -ENEMY_HEIGHT;
-        this.sprite = images['enemy.png'];
+        this.sprite = images['Policeman.png'];
 
         // Each enemy should have a different speed
         this.speed = Math.random() / 2 + 0.25;
@@ -84,9 +132,9 @@ class Toonie {
 
 class Player {
     constructor() {
-        this.x = 2 * PLAYER_WIDTH;
+        this.x =  PLAYER_WIDTH ;
         this.y = GAME_HEIGHT - PLAYER_HEIGHT - 10;
-        this.sprite = images['player.png'];
+        this.sprite = images['TylerSizedR.png'];
     }
 
     // This method is called by the game engine when left/right arrows are pressed
@@ -117,7 +165,9 @@ class Engine {
     constructor(element) {
         // Setup the player
         this.player = new Player();
-        this.paused = false
+        
+        countDown(60, "status");
+        playSong();
 
         // Setup enemies, making sure there are always three
         this.setupEnemies();
@@ -171,7 +221,7 @@ class Engine {
 
     // This method finds a random spot where there is no enemy, and puts one in there
     addEnemy() {
-        var enemySpots = GAME_WIDTH / ENEMY_WIDTH ;
+        var enemySpots = GAME_WIDTH / ENEMY_WIDTH;
 
         var enemySpot;
         // Keep looping until we find a free enemy spot at random
@@ -196,9 +246,9 @@ class Engine {
             else if (e.keyCode === RIGHT_ARROW_CODE) {
                 this.player.move(MOVE_RIGHT);
             }
-            else if(e.keyCode === PAUSE_BUTTON_CODE) {
-                this.paused = !this.paused
-            }
+            // else if(e.keyCode === PAUSE_BUTTON_CODE) {
+            //     this.paused = !this.paused
+            // }
         });
         
 
@@ -234,7 +284,7 @@ class Engine {
         this.toonies.forEach(toonie => toonie.update(timeDiff));
 
         // Draw everything!
-        this.ctx.drawImage(images['stars.png'], 0, 0); // draw the star bg
+        this.ctx.drawImage(images['SaintCatherine.jpg'], 0, 0); // draw the star bg
         this.enemies.forEach(enemy => enemy.render(this.ctx)); // draw the enemies
         this.player.render(this.ctx); // draw the player
         this.toonies.forEach(toonie => toonie.render(this.ctx));
@@ -259,10 +309,11 @@ class Engine {
         //Check if toonie is caught
         if(this.isToonieCaught()){
             
-            this.ctx.font = 'bold 30px Impact';
+            this.ctx.font = 'bold 30px Righteous';
             this.ctx.fillStyle = '#ffffff';
             this.ctx.fillText('You are ' + this.toonieCount + " richer!", 30, 60);
             this.toonieCount++;
+            toonieSound();
             console.log("TOONY CAUGHT", this.toonieCount)
             
         }
@@ -270,14 +321,18 @@ class Engine {
 
         // Check if player is dead
         if (this.isPlayerDead()) {
+            policeSound();
+            youLoseAudio();
             // If they are dead, then it's game over!
-            this.ctx.font = 'bold 30px Impact';
+            this.ctx.font = 'bold 30px Righteous';
             this.ctx.fillStyle = '#ffffff';
             this.ctx.fillText(this.score + ' GAME OVER', 5, 30);
+            
         }
         else {
+            
             // If player is not dead, then draw the score
-            this.ctx.font = 'bold 30px Impact';
+            this.ctx.font = 'bold 30px Righteous';
             this.ctx.fillStyle = '#ffffff';
             this.ctx.fillText(this.score, 5, 30);
 
@@ -305,15 +360,9 @@ class Engine {
 
 
     isPlayerDead() {
-        // TODO: fix this function!
         
-        // this.enemies // array of enemies
-        // var enemy // x , y, W, H
-        // this.player // x, y, W, H
         const hasCollided = (enemy, player)=>{
-            // if(player.y - PLAYER_HEIGHT > enemy.y){console.log("COLLISION", player, enemy )} 
-            // enemy.x = player.x + PLAYER_WIDTH;
-            // enemy.y = player.y;
+    
 
             if(player.y - ENEMY_HEIGHT < enemy.y && player.x === enemy.x){
                 return true;
