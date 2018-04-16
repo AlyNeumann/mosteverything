@@ -225,9 +225,11 @@ class Engine {
         var sec = 60;
         function action() {
             if (sec > 1){var element = document.getElementById("status");
-            element.innerHTML = "You have " + sec + " seconds to make money!";
+            this.ctx.fillText("You have " + sec + " seconds to make money!", 50, 300);
+            // element.innerHTML = "You have " + sec + " seconds to make money!";
             sec = sec - 1;
         }}
+        action = action.bind(this);
         action();
             this.timer = setInterval(action, 1000);
         }
@@ -329,7 +331,7 @@ class Engine {
             this.ctx.font = 'bold 30px Righteous';
             this.ctx.fillStyle = '#ffffff';
             this.ctx.fillText(this.score + ' game over....time to get a real job!', 5, 30);
-            this.ctx.fillText('You are ' + this.toonieCount + ' toonies richer!', 30, 60);
+            this.ctx.fillText('You made $' + this.toonieCount * 2 + '.00!', 30, 60);
             
         }
         else {
