@@ -181,6 +181,8 @@ class Engine {
 
         // Since gameLoop will be called out of context, bind it once here.
         this.gameLoop = this.gameLoop.bind(this);
+
+
     }
 
     /*
@@ -317,6 +319,16 @@ class Engine {
         this.gameLoop();
     }
 
+
+    drawStroked(text, x, y) {
+        this.ctx.font = 'bold 30px Righteous'
+        this.ctx.strokeStyle = 'black';
+        this.ctx.lineWidth = 8;
+        this.ctx.strokeText(text, x, y);
+        this.ctx.fillStyle = 'white';
+        this.ctx.fillText(text, x, y);
+    }
+
     /*
     This is the core of the game engine. The `gameLoop` function gets called ~60 times per second
     During each execution of the function, we will update the positions of all game entities
@@ -336,7 +348,7 @@ class Engine {
 
         // Increase the score!
         this.score += timeDiff;
-        
+
 
 
 
@@ -350,7 +362,10 @@ class Engine {
         this.player.render(this.ctx); // draw the player
         this.toonies.forEach(toonie => toonie.render(this.ctx));
 
-        this.ctx.fillText("You have " + this.sec + " seconds to make money!", 650, 30);
+
+
+        this.drawStroked("You have " + this.sec + " seconds to make money!", 650, 30);
+        // this.ctx.fillText("You have " + this.sec + " seconds to make money!", 650, 30);
 
         // Check if any enemies should die
         this.enemies.forEach((enemy, enemyIdx) => {
@@ -384,11 +399,11 @@ class Engine {
 
 
         // Check if player is dead
-        if(this.isPlayerDead()){
+        if (this.isPlayerDead()) {
             console.log(this.lives)
             this.lives--
             policeSound()
-            if ( this.lives === 0) {
+            if (this.lives === 0) {
                 console.log("HERE WE SHOULD END THE GAME")
                 // this.lives--
                 policeSound();
@@ -398,27 +413,25 @@ class Engine {
                 songStop();
                 this.ctx.fillStyle = "rgba(0, 0, 0, 0.4)";
                 this.ctx.fillRect(0, 0, GAME_WIDTH, GAME_HEIGHT);
-                
+
                 clearInterval(this.timer);
                 // If they are dead, then it's game over!
                 this.ctx.font = 'bold 30px Righteous';
                 this.ctx.strokeStyle = 'black';
                 this.ctx.fillStyle = '#ffffff';
-                this.ctx.fillText(this.score + ' game over....time to get a real job!', 5, 30);
-                this.ctx.fillText('You made $' + this.toonieCount * 2 + '.00!', 30, 60);
+                this.drawStroked(this.score + ' game over....time to get a real job!', 5, 30);
+                this.drawStroked('You made $' + this.toonieCount * 2 + '.00!', 30, 60);
                 gameEngine.restart()
-            // }else if(this.isPlayerDead()){
-            //     policeSound();
-            //     delete this.enemies[i];
                 
+
             }
         }
         if (this.sec === 0) {
             this.ctx.font = 'bold 30px Righteous';
             this.ctx.fillStyle = '#ffffff';
             this.ctx.strokeStyle = 'black';
-            this.ctx.fillText(this.score, 5, 30);
-            this.ctx.fillText('You made $' + this.toonieCount * 2 + '.00! Nice playing!', 30, 60);    
+            this.drawStroked(this.score, 5, 30);
+            this.drawStroked('You made $' + this.toonieCount * 2 + '.00! Nice playing!', 30, 60);
         }
         else {
 
@@ -426,8 +439,8 @@ class Engine {
             this.ctx.font = 'bold 30px Righteous';
             this.ctx.fillStyle = '#ffffff';
             this.ctx.strokeStyle = 'black';
-            this.ctx.fillText(this.score, 5, 30);
-            this.ctx.fillText('You have ' + this.lives +' lives', 700, 60);
+            this.drawStroked(this.score, 5, 30);
+            this.drawStroked('You have ' + this.lives + ' lives', 700, 60);
 
             // Set the time marker and redraw
             this.lastFrame = Date.now();
@@ -454,7 +467,7 @@ class Engine {
 
     isPlayerDead() {
 
-        const hasCollided = (enemy,idx, player) => {
+        const hasCollided = (enemy, idx, player) => {
 
 
             if (player.y - ENEMY_HEIGHT < enemy.y && (player.x === enemy.x || player.x === enemy.x - 75)) {
@@ -465,7 +478,7 @@ class Engine {
             return false
 
         }
-        return this.enemies.some((e,idx) => hasCollided(e, idx, this.player)) 
+        return this.enemies.some((e, idx) => hasCollided(e, idx, this.player))
     }
 }
 
