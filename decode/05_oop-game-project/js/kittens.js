@@ -33,24 +33,37 @@ var policeAudio = new Audio('policeS.mp3');
 var lostAudio = new Audio('youLoseS.mp3');
 var wonAudio = new Audio('youWinS.mp3');
 var timer = undefined;
+var rainAudio = new Audio('rain.mp3');
+var lives = 3;
 
-function playSong(){
+//isplayerdead? lives--
+// if lives = 0, fillText....
+
+function playSong() {
     song.play();
 }
 
-function toonieSound(){
+function songStop() {
+    song.pause()
+}
+
+function rainSound() {
+    rainAudio.play();
+}
+
+function toonieSound() {
     toonieAudio.play();
 }
 
-function policeSound(){
+function policeSound() {
     policeAudio.play();
 }
 
-function youLoseAudio(){
+function youLoseAudio() {
     lostAudio.play();
 }
 
-function youWinAudio(){
+function youWinAudio() {
     wonAudio.play();
 }
 
@@ -67,8 +80,8 @@ var images = {};
 
 
 
-    
-    
+
+
 // This section is where you will be doing most of your coding
 class Entity {
     render(ctx) {
@@ -76,7 +89,7 @@ class Entity {
     }
 }
 
-class Enemy extends Entity{
+class Enemy extends Entity {
     constructor(xPos) {
         super();
         this.x = xPos;
@@ -91,10 +104,10 @@ class Enemy extends Entity{
         this.y = this.y + timeDiff * this.speed;
     }
 
-    
+
 }
 
-class Toonie extends Entity{
+class Toonie extends Entity {
     constructor(xPos) {
         super();
         this.x = xPos;
@@ -112,10 +125,10 @@ class Toonie extends Entity{
 
 }
 
-class Player extends Entity{
+class Player extends Entity {
     constructor() {
         super();
-        this.x =  PLAYER_WIDTH ;
+        this.x = PLAYER_WIDTH;
         this.y = GAME_HEIGHT - PLAYER_HEIGHT - 10;
         this.sprite = images['TylerSizedR.png'];
     }
@@ -130,7 +143,7 @@ class Player extends Entity{
         }
     }
 
-   
+
 }
 
 
@@ -147,21 +160,16 @@ class Engine {
         // Setup the player
         this.player = new Player();
 
-        this.countDown();
-        
         playSong();
-
 
         // Setup enemies, making sure there are always three
         this.setupEnemies();
         this.setupToonies();
 
-        reload.addEventListener("click", ()=> {
+        reload.addEventListener("click", () => {
             location.reload();
         })
 
-       
-        
 
         // Setup the <canvas> element where we will be drawing
         var canvas = document.createElement('canvas');
@@ -190,10 +198,10 @@ class Engine {
     }
 
     setupToonies() {
-        if(!this.toonies){
+        if (!this.toonies) {
             this.toonies = [];
         }
-        while (this.toonies.filter(e => !!e).length <= MAX_TOONIES){
+        while (this.toonies.filter(e => !!e).length <= MAX_TOONIES) {
             this.addToonie();
         }
     }
@@ -202,7 +210,7 @@ class Engine {
         var toonieSpots = GAME_WIDTH / TOONIE_WIDTH;
 
         var toonieSpot;
-        while(!toonieSpot && this.toonies[toonieSpot]){
+        while (!toonieSpot && this.toonies[toonieSpot]) {
             toonieSpot = Math.floor(Math.random() * toonieSpots);
         }
         this.toonies[toonieSpot] = new Toonie(toonieSpot * TOONIE_WIDTH);
@@ -220,21 +228,70 @@ class Engine {
 
         this.enemies[enemySpot] = new Enemy(enemySpot * ENEMY_WIDTH);
     }
-        
+
     countDown() {
-        var sec = 60;
+        this.sec = 60;
         function action() {
-            if (sec > 1){var element = document.getElementById("status");
-            this.ctx.fillText("You have " + sec + " seconds to make money!", 50, 300);
-            // element.innerHTML = "You have " + sec + " seconds to make money!";
-            sec = sec - 1;
-        }}
+            if (this.sec > 0) {
+
+                this.sec = this.sec - 1;
+            }
+        }
         action = action.bind(this);
         action();
-            this.timer = setInterval(action, 1000);
+        this.timer = setInterval(action, 1000);
+    }
+
+
+    makeItRain() {
+        var md = 100;
+        var drops = [];
+
+        //loop through empty drops & apply attributes
+
+        for (var i = 0; i < md; i++) {
+            drops.push({
+                x: Math.random() * GAME_WIDTH,
+                y: Math.random() * GAME_HEIGHT,
+                r: Math.random() * 2 + 2,
+                s: Math.random() + 1
+            })
         }
 
-        
+        //draw rain onto canvas
+
+        function drawDrops(ctx) {
+            // ctx.clearRect(0, 0, GAME_WIDTH, GAME_HEIGHT);
+            ctx.fillStyle = '#9eb4d8';
+            ctx.beginPath();
+            for (var i = 0; i < md; i++) {
+                var d = drops[i];
+                ctx.moveTo(d.x, d.y);
+                ctx.arc(d.x, d.y, d.r, 0, Math.PI * 2, true);
+
+            }
+            ctx.fill();
+            moveDrops();
+        }
+        var angle = 0;
+
+        function moveDrops() {
+            angle += 0.01;
+            for (var i = 0; i < md; i++) {
+                var d = drops[i];
+
+                d.y += Math.pow(d.s, 2) + 1;
+                d.x += Math.sin(angle);
+
+                if (d.y > GAME_HEIGHT) {
+                    drops[i] = { x: Math.random() * GAME_WIDTH, y: 0, r: d.r, s: d.s }
+                }
+            }
+        }
+        setInterval(() => drawDrops(this.ctx), 100);
+
+    }
+
 
 
     // This method kicks off the game
@@ -242,6 +299,7 @@ class Engine {
         this.score = 0;
         this.toonieCount = 0;
         this.lastFrame = Date.now();
+        this.lives = 3;
 
         // Listen for keyboard left/right and update the player
         document.addEventListener('keydown', e => {
@@ -251,11 +309,11 @@ class Engine {
             else if (e.keyCode === RIGHT_ARROW_CODE) {
                 this.player.move(MOVE_RIGHT);
             }
-            
+
         });
-        
 
 
+        this.countDown();
         this.gameLoop();
     }
 
@@ -275,12 +333,12 @@ class Engine {
 
         var currentFrame = Date.now();
         var timeDiff = currentFrame - this.lastFrame;
-        // countDown(60, "status");
-        // playSong();
 
         // Increase the score!
         this.score += timeDiff;
-    
+        this.lives--;
+
+
 
         // Call update on all enemies
         this.enemies.forEach(enemy => enemy.update(timeDiff));
@@ -291,6 +349,8 @@ class Engine {
         this.enemies.forEach(enemy => enemy.render(this.ctx)); // draw the enemies
         this.player.render(this.ctx); // draw the player
         this.toonies.forEach(toonie => toonie.render(this.ctx));
+
+        this.ctx.fillText("You have " + this.sec + " seconds to make money!", 650, 30);
 
         // Check if any enemies should die
         this.enemies.forEach((enemy, enemyIdx) => {
@@ -303,42 +363,61 @@ class Engine {
         // Check if toonies should disappear 
 
         this.toonies.forEach((toonie, toonieIdx) => {
-            if(toonie.y > GAME_HEIGHT){
+            if (toonie.y > GAME_HEIGHT) {
                 delete this.toonies[toonieIdx];
             }
         })
         this.setupToonies();
 
         //Check if toonie is caught
-        if(this.isToonieCaught()){
-            
+        if (this.isToonieCaught()) {
+
             this.ctx.font = 'bold 30px Righteous';
             this.ctx.fillStyle = '#ffffff';
+            this.ctx.strokeStyle = 'black';
             // this.ctx.fillText('You are ' + this.toonieCount + ' toonies richer!', 30, 60);
             this.toonieCount++;
             toonieSound();
             console.log("TOONIE CAUGHT", this.toonieCount)
-            
+
         }
 
 
         // Check if player is dead
-        if (this.isPlayerDead()) {
+        if (this.lives = 0 && this.isPlayerDead()) {
             policeSound();
             youLoseAudio();
+            this.makeItRain()
+            rainSound();
+            songStop();
+            this.ctx.fillStyle = "rgba(0, 0, 0, 0.4)";
+            this.ctx.fillRect(0, 0, GAME_WIDTH, GAME_HEIGHT);
+            ;
             clearInterval(this.timer);
             // If they are dead, then it's game over!
             this.ctx.font = 'bold 30px Righteous';
+            this.ctx.strokeStyle = 'black';
             this.ctx.fillStyle = '#ffffff';
             this.ctx.fillText(this.score + ' game over....time to get a real job!', 5, 30);
             this.ctx.fillText('You made $' + this.toonieCount * 2 + '.00!', 30, 60);
+
+        }
+        else if (this.sec === 0) {
+            this.ctx.font = 'bold 30px Righteous';
+            this.ctx.fillStyle = '#ffffff';
+            this.ctx.strokeStyle = 'black';
+            this.ctx.fillText(this.score, 5, 30);
+            this.ctx.fillText('You made $' + this.toonieCount * 2 + '.00! Nice playing!', 30, 60);
+
+            // Set the time marker and redraw
             
         }
         else {
-            
+
             // If player is not dead, then draw the score
             this.ctx.font = 'bold 30px Righteous';
             this.ctx.fillStyle = '#ffffff';
+            this.ctx.strokeStyle = 'black';
             this.ctx.fillText(this.score, 5, 30);
 
             // Set the time marker and redraw
@@ -347,36 +426,37 @@ class Engine {
         }
     }
 
-    isToonieCaught(){
+    isToonieCaught() {
         const hasCollided = (toonie, player) => {
-            if(player.y - TOONIE_HEIGHT < toonie.y && (player.x === toonie.x || player.x === toonie.x - 75)){
+            if (player.y - TOONIE_HEIGHT < toonie.y && (player.x === toonie.x || player.x === toonie.x - 75)) {
                 return true;
             }
-            return false; 
+            return false;
         }
-        var caughtToonie =  this.toonies.some((e)=> hasCollided(e, this.player))
-        
-        
-        this.toonies && this.toonies.forEach((e, i)=> hasCollided(e, this.player) &&  delete this.toonies[i])
-        
-        
+        var caughtToonie = this.toonies.some((e) => hasCollided(e, this.player))
+
+
+        this.toonies && this.toonies.forEach((e, i) => hasCollided(e, this.player) && delete this.toonies[i])
+
+
         return caughtToonie
     }
 
 
     isPlayerDead() {
-        
-        const hasCollided = (enemy, player)=>{
-    
 
-            if(player.y - ENEMY_HEIGHT < enemy.y && (player.x === enemy.x || player.x === enemy.x  - 75)){
+        const hasCollided = (enemy, player) => {
+
+
+            if (player.y - ENEMY_HEIGHT < enemy.y && (player.x === enemy.x || player.x === enemy.x - 75)) {
+                delete this.enemies[i];
                 return true;
                 console.log("enemy collision!")
             }
             return false
-            
-        } 
-        return this.enemies.some((e)=> hasCollided(e, this.player)) 
+
+        }
+        return this.enemies.some((e) => hasCollided(e, this.player))
     }
 }
 
