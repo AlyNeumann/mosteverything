@@ -64,8 +64,8 @@ var images = {};
 });
 
 
-playSong();
-countDown(60, "status");
+
+
 
     
     
@@ -147,8 +147,10 @@ class Engine {
         // Setup the player
         this.player = new Player();
 
+        this.countDown();
         
-        // playSong();
+        playSong();
+
 
         // Setup enemies, making sure there are always three
         this.setupEnemies();
@@ -222,13 +224,15 @@ class Engine {
     countDown() {
         var sec = 60;
         function action() {
-        var element = document.getElementById("status");
-        element.innerHTML = "You have " + sec + " seconds to make money!";
-        sec = sec - 1;
-        }
+            if (sec > 1){var element = document.getElementById("status");
+            element.innerHTML = "You have " + sec + " seconds to make money!";
+            sec = sec - 1;
+        }}
         action();
             this.timer = setInterval(action, 1000);
         }
+
+        
 
 
     // This method kicks off the game
@@ -320,6 +324,7 @@ class Engine {
         if (this.isPlayerDead()) {
             policeSound();
             youLoseAudio();
+            clearInterval(this.timer);
             // If they are dead, then it's game over!
             this.ctx.font = 'bold 30px Righteous';
             this.ctx.fillStyle = '#ffffff';
