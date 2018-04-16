@@ -32,6 +32,7 @@ var toonieAudio = new Audio('toonieS.mp3');
 var policeAudio = new Audio('policeS.mp3');
 var lostAudio = new Audio('youLoseS.mp3');
 var wonAudio = new Audio('youWinS.mp3');
+var timer = undefined;
 
 function playSong(){
     song.play();
@@ -64,31 +65,8 @@ var images = {};
 
 
 playSong();
+countDown(60, "status");
 
-
-reload.addEventListener("click", ()=> {
-    location.reload();
-})
-
-
-// timer function
-var countDown = function(sec, elem){
-    var element = document.getElementById(elem);
-    element.innerHTML = "You have " + sec + " seconds to make money!";
-    if(sec < 1){
-        clearTimeout(timer);
-        element.innerHTML = '<p class="typing">Round Complete!</p>';
-        element.innerHTML += '<p class="typing">Press the Reload button to play again!</p>';
-    // }else if(isPlayerDead === true){
-    //     clearTimeout(timer);
-    //     element.innerHTML = '<p class="typing">You lose!</p>';
-    }
-    sec--;
-    var timer = setTimeout('countDown('+sec+', "'+elem+'")', 1000);
-    
-
-    
-}
     
     
 // This section is where you will be doing most of your coding
@@ -170,13 +148,17 @@ class Engine {
         this.player = new Player();
 
         
-        
-        countDown(60, "status");
         // playSong();
 
         // Setup enemies, making sure there are always three
         this.setupEnemies();
         this.setupToonies();
+
+        reload.addEventListener("click", ()=> {
+            location.reload();
+        })
+
+       
         
 
         // Setup the <canvas> element where we will be drawing
@@ -236,6 +218,18 @@ class Engine {
 
         this.enemies[enemySpot] = new Enemy(enemySpot * ENEMY_WIDTH);
     }
+        
+    countDown() {
+        var sec = 60;
+        function action() {
+        var element = document.getElementById("status");
+        element.innerHTML = "You have " + sec + " seconds to make money!";
+        sec = sec - 1;
+        }
+        action();
+            this.timer = setInterval(action, 1000);
+        }
+
 
     // This method kicks off the game
     start() {
