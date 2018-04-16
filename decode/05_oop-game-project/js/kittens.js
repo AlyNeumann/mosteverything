@@ -336,7 +336,7 @@ class Engine {
 
         // Increase the score!
         this.score += timeDiff;
-        this.lives--;
+        
 
 
 
@@ -384,33 +384,41 @@ class Engine {
 
 
         // Check if player is dead
-        if (this.lives = 0 && this.isPlayerDead()) {
-            policeSound();
-            youLoseAudio();
-            this.makeItRain()
-            rainSound();
-            songStop();
-            this.ctx.fillStyle = "rgba(0, 0, 0, 0.4)";
-            this.ctx.fillRect(0, 0, GAME_WIDTH, GAME_HEIGHT);
-            ;
-            clearInterval(this.timer);
-            // If they are dead, then it's game over!
-            this.ctx.font = 'bold 30px Righteous';
-            this.ctx.strokeStyle = 'black';
-            this.ctx.fillStyle = '#ffffff';
-            this.ctx.fillText(this.score + ' game over....time to get a real job!', 5, 30);
-            this.ctx.fillText('You made $' + this.toonieCount * 2 + '.00!', 30, 60);
-
+        if(this.isPlayerDead()){
+            console.log(this.lives)
+            this.lives--
+            policeSound()
+            if ( this.lives === 0) {
+                console.log("HERE WE SHOULD END THE GAME")
+                // this.lives--
+                policeSound();
+                youLoseAudio();
+                this.makeItRain()
+                rainSound();
+                songStop();
+                this.ctx.fillStyle = "rgba(0, 0, 0, 0.4)";
+                this.ctx.fillRect(0, 0, GAME_WIDTH, GAME_HEIGHT);
+                
+                clearInterval(this.timer);
+                // If they are dead, then it's game over!
+                this.ctx.font = 'bold 30px Righteous';
+                this.ctx.strokeStyle = 'black';
+                this.ctx.fillStyle = '#ffffff';
+                this.ctx.fillText(this.score + ' game over....time to get a real job!', 5, 30);
+                this.ctx.fillText('You made $' + this.toonieCount * 2 + '.00!', 30, 60);
+                gameEngine.restart()
+            // }else if(this.isPlayerDead()){
+            //     policeSound();
+            //     delete this.enemies[i];
+                
+            }
         }
-        else if (this.sec === 0) {
+        if (this.sec === 0) {
             this.ctx.font = 'bold 30px Righteous';
             this.ctx.fillStyle = '#ffffff';
             this.ctx.strokeStyle = 'black';
             this.ctx.fillText(this.score, 5, 30);
-            this.ctx.fillText('You made $' + this.toonieCount * 2 + '.00! Nice playing!', 30, 60);
-
-            // Set the time marker and redraw
-            
+            this.ctx.fillText('You made $' + this.toonieCount * 2 + '.00! Nice playing!', 30, 60);    
         }
         else {
 
@@ -419,6 +427,7 @@ class Engine {
             this.ctx.fillStyle = '#ffffff';
             this.ctx.strokeStyle = 'black';
             this.ctx.fillText(this.score, 5, 30);
+            this.ctx.fillText('You have ' + this.lives +' lives', 700, 60);
 
             // Set the time marker and redraw
             this.lastFrame = Date.now();
@@ -445,18 +454,18 @@ class Engine {
 
     isPlayerDead() {
 
-        const hasCollided = (enemy, player) => {
+        const hasCollided = (enemy,idx, player) => {
 
 
             if (player.y - ENEMY_HEIGHT < enemy.y && (player.x === enemy.x || player.x === enemy.x - 75)) {
-                delete this.enemies[i];
+                delete this.enemies[idx];
                 return true;
                 console.log("enemy collision!")
             }
             return false
 
         }
-        return this.enemies.some((e) => hasCollided(e, this.player))
+        return this.enemies.some((e,idx) => hasCollided(e, idx, this.player)) 
     }
 }
 
