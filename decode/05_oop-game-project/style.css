@@ -15,7 +15,7 @@
 
   #reload{
     background-color:#043789;
-    border: none;
+    border: 4mm ridge rgba(182, 4, 4, 0.6);
     color: #c4c9d1;
     padding: 15px 32px;
     text-align: center;
