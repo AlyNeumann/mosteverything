@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+
+<head>
+    <script src="https://unpkg.com/react@16/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@16/umd/react-dom.development.js"></script>
+</head>
+
+<body>
+    <div id="root"></div>
+    <script>
+       
+        class button extends React.Component {
+            constructor() {
+                super();
+                this.state = { clicked: 0 }
+            }
+            render() {
+                return React.createElement("button", { onClick: () => this.setState({ clicked: this.state.clicked + 1 }) }, "You clicked " + this.state.clicked + " times!")
+            }
+        }
+        var rootDiv = document.getElementById("root");
+    ReactDOM.render(React.createElement(button, null), rootDiv);
+
+    </script>
+</body>
+
+</html>

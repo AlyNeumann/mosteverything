@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+
+<head>
+    <script src="https://unpkg.com/react@16/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@16/umd/react-dom.development.js"></script>
+</head>
+
+<body>
+    <div id="root">
+
+    </div>
+    <script>
+        function getTime() {
+                var nowTime = new Date();
+                return `${nowTime.getHours()} : ${nowTime.getMinutes()} : ${nowTime.getSeconds()}`;
+            }
+        class CurrentTime extends React.Component {
+            constructor() {
+                super();
+                this.state = {time: ""};
+            }
+            componentWillMount() {
+                this.updateTime();
+                this.timeInterval = setInterval(this.updateTime.bind(this), 1000);
+            }
+            updateTime() {
+                this.setState({time: getTime()});
+            }
+            componentWillUnmount() {
+                clearInterval(this.timeInterval);
+            }
+            render() {
+                return React.createElement("div", null, this.state.time)
+            }
+        }
+        var rootDiv = document.getElementById("root");
+        ReactDOM.render(React.createElement(CurrentTime), rootDiv)
+
+    </script>
+</body>
+
+</html>
+

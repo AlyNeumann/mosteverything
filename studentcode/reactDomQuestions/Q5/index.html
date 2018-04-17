@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+
+<head>
+    <title>Chomsky Quote Generator</title>
+    <script src="https://unpkg.com/react@16/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@16/umd/react-dom.development.js"></script>
+
+</head>
+
+<body>
+    <div id="root">
+
+    </div>
+    <script>
+        var quotes = ["Colorless green ideas sleep furiously.",
+            "If we don't believe in freedom of expression for people we despise, we don't believe in it at all.",
+            "Propaganda is to a democracy what the bludgeon is to a totalitarian state.",
+            "Everyone’s worried about stopping terrorism. Well, there’s really an easy way: Stop participating in it.",
+            "Either you repeat the same conventional doctrines everybody is saying, or else you say something true, and it will sound like it's from Neptune."]
+
+        class Populate extends React.Component {
+            constructor() {
+                super();
+                this.state = {};
+            }
+            render() {
+                return React.createElement("div", null, this.state.quote, React.createElement("button", { onClick: () => this.setState({ quote: newQuote()}) }, "Click!"))
+            }
+        }
+        function newQuote() {
+            var randomNumber = Math.floor(Math.random() * (quotes.length));
+            return quotes[randomNumber];
+        }
+        // var randomQuote = newQuote();
+        var rootDiv = document.getElementById("root");
+        ReactDOM.render(React.createElement(Populate, null), rootDiv);
+
+
+
+    </script>
+</body>
+
+</html>
