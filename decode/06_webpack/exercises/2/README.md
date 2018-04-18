@@ -1,5 +1,5 @@
 ## Description
-I've included a app.js file and an index.html file
+I've included an app.js file and an index.html file
 Do not modify them!
 main.js imports two files: a.js and b.js  
 It is up to you to write those two imported files
